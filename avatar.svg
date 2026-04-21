@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="potGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0969da;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1a7f37;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="swarmGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#d4a017;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#9a6700;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="128" cy="128" r="120" fill="#f6f8fa" stroke="#d0d7de" stroke-width="2"/>
+  
+  <!-- POT/Trie structure (tree-like) -->
+  <g transform="translate(128, 60)">
+    <!-- Root -->
+    <circle cx="0" cy="0" r="18" fill="url(#potGradient)"/>
+    <text x="0" y="6" text-anchor="middle" fill="white" font-family="Arial" font-size="16" font-weight="bold">P</text>
+    
+    <!-- Branches -->
+    <line x1="0" y1="18" x2="-30" y2="50" stroke="#0969da" stroke-width="4" stroke-linecap="round"/>
+    <line x1="0" y1="18" x2="30" y2="50" stroke="#0969da" stroke-width="4" stroke-linecap="round"/>
+    
+    <!-- Nodes -->
+    <circle cx="-30" cy="55" r="12" fill="#0969da"/>
+    <circle cx="30" cy="55" r="12" fill="#0969da"/>
+    
+    <!-- Second level branches -->
+    <line x1="-30" y1="67" x2="-50" y2="95" stroke="#0969da" stroke-width="3" stroke-linecap="round"/>
+    <line x1="-30" y1="67" x2="-10" y2="95" stroke="#0969da" stroke-width="3" stroke-linecap="round"/>
+    <line x1="30" y1="67" x2="10" y2="95" stroke="#0969da" stroke-width="3" stroke-linecap="round"/>
+    <line x1="30" y1="67" x2="50" y2="95" stroke="#0969da" stroke-width="3" stroke-linecap="round"/>
+    
+    <!-- Leaf nodes (key-value pairs) -->
+    <circle cx="-50" cy="100" r="8" fill="#1a7f37"/>
+    <circle cx="-10" cy="100" r="8" fill="#1a7f37"/>
+    <circle cx="10" cy="100" r="8" fill="#1a7f37"/>
+    <circle cx="50" cy="100" r="8" fill="#1a7f37"/>
+  </g>
+  
+  <!-- Swarm bee/honeycomb at bottom -->
+  <g transform="translate(128, 195)">
+    <!-- Honeycomb hexagon -->
+    <polygon points="0,-15 13,-7.5 13,7.5 0,15 -13,7.5 -13,-7.5" 
+             fill="url(#swarmGradient)" stroke="#9a6700" stroke-width="2"/>
+    <!-- Bee dot -->
+    <circle cx="0" cy="-2" r="4" fill="#1f2328"/>
+  </g>
+  
+  <!-- Label -->
+  <text x="128" y="235" text-anchor="middle" fill="#1f2328" font-family="Arial" font-size="18" font-weight="bold">POTIS</text>
+</svg>
