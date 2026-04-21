@@ -1,0 +1,60 @@
+# Docker Swarm / Stack deployment configuration
+# Usage:
+#   1. Build image first: docker build -t potis.local:0.1.0 ./build
+#   2. Deploy: docker stack deploy -c docker-compose.swarm.yml potis
+#
+# Or with external registry:
+#   docker stack deploy -c docker-compose.swarm.yml potis
+
+services:
+  potis:
+    image: potis.public.dappnode.eth:0.1.0
+    restart: unless-stopped
+    ports:
+      - target: 8080
+        published: 80
+        mode: host
+      - target: 8080
+        published: 8080
+        mode: host
+    volumes:
+      - type: volume
+        source: potis-data
+        target: /app/data
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+      - BEE_URL=${BEE_URL:-http://host.docker.internal:1633}
+      - BATCH_ID=${BATCH_ID:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    networks:
+      - potis-network
+
+volumes:
+  potis-data:
+    driver: local
+
+networks:
+  potis-network:
+    driver: overlay
+    attachable: true

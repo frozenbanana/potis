@@ -1,0 +1,17 @@
+{
+  "name": "pot-config-store",
+  "version": "0.1.0",
+  "description": "Decentralized configuration store using POT.js and Swarm",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "NODE_ENV=development node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "license": "GPL-3.0"
+}

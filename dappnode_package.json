@@ -1,0 +1,26 @@
+{
+  "name": "potis.public.dappnode.eth",
+  "version": "0.1.0",
+  "description": "Decentralized key-value store using POT.js and Swarm - like Redis for decentralized storage",
+  "type": "service",
+  "author": "metaprovide",
+  "license": "GPL-3.0",
+  "homepage": "https://github.com/brainiac-five/potis",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brainiac-five/potis.git"
+  },
+  "categories": ["Storage", "Developer Tools"],
+  "architectures": ["linux/arm64", "linux/amd64"],
+  "links": {
+    "homepage": "https://github.com/brainiac-five/potis",
+    "api": "http://potis.public.dappnode.eth:8080",
+    "docs": "http://potis.public.dappnode.eth:8080/api/docs"
+  },
+  "exposes": {
+    "api": {
+      "port": 8080,
+      "type": "http"
+    }
+  }
+}

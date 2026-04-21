@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potis API Documentation</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.css">
+    <style>
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f6f8fa;
+            --bg-tertiary: #ffffff;
+            --text-primary: #1f2328;
+            --text-secondary: #656d76;
+            --accent: #0969da;
+            --border: #d0d7de;
+            --success: #1a7f37;
+            --danger: #cf222e;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+        }
+
+        .swagger-ui {
+            background: var(--bg-primary);
+        }
+
+        .swagger-ui .topbar {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .swagger-ui .topbar .download-url-wrapper input[type=text] {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .swagger-ui .topbar .download-url-wrapper .download-url-button {
+            background: var(--accent);
+        }
+
+        .swagger-ui .info {
+            background: var(--bg-secondary);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid var(--border);
+        }
+
+        .swagger-ui .info .title {
+            color: var(--text-primary);
+            font-size: 2em;
+        }
+
+        .swagger-ui .info .description {
+            color: var(--text-secondary);
+        }
+
+        .swagger-ui .scheme-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .swagger-ui .opblock {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .swagger-ui .opblock .opblock-summary {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .swagger-ui .opblock .opblock-summary-method {
+            border-radius: 4px;
+        }
+
+        .swagger-ui .opblock-body {
+            background: var(--bg-primary);
+        }
+
+        .swagger-ui .opblock-tag {
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .swagger-ui .opblock-tag small {
+            color: var(--text-secondary);
+        }
+
+        .swagger-ui .responses-inner h4, .swagger-ui .responses-inner h5 {
+            color: var(--text-primary);
+        }
+
+        .swagger-ui .response-col_status {
+            color: var(--text-primary);
+        }
+
+        .swagger-ui .response-col_description {
+            color: var(--text-secondary);
+        }
+
+        .swagger-ui .tab li {
+            color: var(--text-secondary);
+        }
+
+        .swagger-ui .tab li.active {
+            color: var(--accent);
+        }
+
+        .swagger-ui .prop-type {
+            color: var(--accent);
+        }
+
+        .swagger-ui .prop-format {
+            color: var(--text-secondary);
+        }
+
+        .swagger-ui section.models {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .swagger-ui section.models .model-container {
+            background: var(--bg-primary);
+        }
+
+        .swagger-ui .model-box {
+            background: var(--bg-primary);
+        }
+
+        .swagger-ui .model-title {
+            color: var(--text-primary);
+        }
+
+        .swagger-ui .model .property.primitive {
+            color: var(--accent);
+        }
+
+        .swagger-ui .model .property .property-primitive {
+            color: var(--text-secondary);
+        }
+
+        .swagger-ui .btn {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .swagger-ui .btn.execute {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+
+        .swagger-ui .btn.cancel {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+        }
+
+        .swagger-ui textarea {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .swagger-ui input[type=text], .swagger-ui input[type=password], .swagger-ui input[type=search] {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .swagger-ui select {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .swagger-ui .parameter__name {
+            color: var(--text-primary);
+        }
+
+        .swagger-ui .parameter__type {
+            color: var(--accent);
+        }
+
+        .swagger-ui .parameter__in {
+            color: var(--text-secondary);
+        }
+
+        .swagger-ui .parameter__default {
+            color: var(--text-secondary);
+        }
+
+        .swagger-ui .response-content-type label, .swagger-ui .response-content-type select {
+            color: var(--text-primary);
+        }
+
+        .swagger-ui .curl-command, .swagger-ui .request-url, .swagger-ui .microlight {
+            background: #f6f8fa;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .swagger-ui .highlight-code>.microlight code {
+            color: var(--text-primary);
+        }
+
+        .swagger-ui .markdown p, .swagger-ui .markdown pre, .swagger-ui .markdown ul, .swagger-ui .markdown ol {
+            color: var(--text-secondary);
+        }
+
+        .swagger-ui .markdown h1, .swagger-ui .markdown h2, .swagger-ui .markdown h3, .swagger-ui .markdown h4 {
+            color: var(--text-primary);
+        }
+
+        .swagger-ui .markdown code {
+            background: #eff1f3;
+            color: var(--accent);
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+        }
+
+        .topbar-wrapper img {
+            content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%230969da' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cellipse cx='12' cy='5' rx='9' ry='3'%3E%3C/ellipse%3E%3Cpath d='M21 12c0 1.66-4 3-9 3s-9-1.34-9-3'%3E%3C/path%3E%3Cpath d='M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5'%3E%3C/path%3E%3C/svg%3E");
+        }
+
+        /* Back to app link */
+        .back-link {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 10000;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .back-link:hover {
+            background: var(--border);
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">← Back to Potis</a>
+    <div id="swagger-ui"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            const ui = SwaggerUIBundle({
+                spec: {
+                    "openapi": "3.0.3",
+                    "info": {
+                        "title": "Potis API",
+                        "description": "Decentralized Key-Value Store (POT + Redis) - Store, backup, and restore your data immutably on Swarm decentralized storage.\\n\\n## Features\\n\\n- Key-Value Operations: Simple GET, PUT, DELETE operations like Redis\\n- Decentralized Storage: Persist data to Swarm network\\n- Immutable References: Every save creates a permanent reference hash\\n- In-Memory Mode: Test and develop without Swarm connection\\n- Reference History: Track all saved snapshots\\n\\n## Quick Start\\n\\n1. Initialize KVS: POST /api/init\\n2. Store data: PUT /api/kv with {key: x, value: y}\\n3. Retrieve data: GET /api/kv/{key}\\n4. Delete data: DELETE /api/kv/{key}\\n5. Save to Swarm: POST /api/config/save",
+                        "version": "0.1.0",
+                        "contact": {
+                            "name": "metaprovide",
+                            "url": "https://github.com/brainiac-five/potis"
+                        },
+                        "license": {
+                            "name": "GPL-3.0",
+                            "url": "https://www.gnu.org/licenses/gpl-3.0.html"
+                        }
+                    },
+                    "servers": [
+                        {
+                            "url": "http://localhost:8080",
+                            "description": "Local development server"
+                        },
+                        {
+                            "url": "http://potis.public.dappnode.eth:8080",
+                            "description": "DappNode production server"
+                        }
+                    ],
+                    "tags": [
+                        {
+                            "name": "Status",
+                            "description": "Health and system status endpoints"
+                        },
+                        {
+                            "name": "KVS",
+                            "description": "Key-Value Store initialization and management"
+                        },
+                        {
+                            "name": "KV",
+                            "description": "Key-value operations - Redis-like interface (GET, PUT, DELETE)"
+                        },
+                        {
+                            "name": "Swarm",
+                            "description": "Swarm decentralized storage operations"
+                        },
+                        {
+                            "name": "References",
+                            "description": "Reference history management"
+                        }
+                    ],
+                    "paths": {
+                        "/health": {
+                            "get": {
+                                "tags": ["Status"],
+                                "summary": "Health check",
+                                "description": "Health check endpoint for monitoring system status",
+                                "operationId": "healthCheck",
+                                "responses": {
+                                    "200": {
+                                        "description": "Service is healthy",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/HealthResponse"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "/api/status": {
+                            "get": {
+                                "tags": ["Status"],
+                                "summary": "Get system status",
+                                "description": "Returns detailed system status including initialization state and mode",
+                                "operationId": "getStatus",
+                                "responses": {
+                                    "200": {
+                                        "description": "System status",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/StatusResponse"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "/api/environment": {
+                            "get": {
+                                "tags": ["Status"],
+                                "summary": "Get environment configuration",
+                                "description": "Returns current environment settings",
+                                "operationId": "getEnvironment",
+                                "responses": {
+                                    "200": {
+                                        "description": "Environment configuration",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/EnvironmentResponse"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "/api/init": {
+                            "post": {
+                                "tags": ["KVS"],
+                                "summary": "Initialize KVS",
+                                "description": "Initialize a new Key-Value Store. Auto-called on first use if not initialized.",
+                                "operationId": "initKVS",
+                                "responses": {
+                                    "200": {
+                                        "description": "KVS initialized successfully",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/InitResponse"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "500": {
+                                        "description": "Initialization failed"
+                                    }
+                                }
+                            }
+                        },
+                        "/api/kv": {
+                            "get": {
+                                "tags": ["KV"],
+                                "summary": "List all keys",
+                                "description": "Returns all keys and their values in the KVS (Redis-like KEYS command)",
+                                "operationId": "listKeys",
+                                "responses": {
+                                    "200": {
+                                        "description": "List of keys",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/KeysResponse"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "400": {
+                                        "description": "KVS not initialized"
+                                    }
+                                }
+                            },
+                            "put": {
+                                "tags": ["KV"],
+                                "summary": "Store a key-value pair",
+                                "description": "Store or update a key-value pair in the KVS (Redis-like SET command)",
+                                "operationId": "putKey",
+                                "requestBody": {
+                                    "required": true,
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "$ref": "#/components/schemas/PutKeyRequest"
+                                            },
+                                            "examples": {
+                                                "string": {
+                                                    "summary": "String value",
+                                                    "value": {
+                                                        "key": "username",
+                                                        "value": "alice"
+                                                    }
+                                                },
+                                                "object": {
+                                                    "summary": "JSON object",
+                                                    "value": {
+                                                        "key": "config",
+                                                        "value": "{\"setting\":\"value\"}"
+                                                    }
+                                                },
+                                                "number": {
+                                                    "summary": "Number value",
+                                                    "value": {
+                                                        "key": "counter",
+                                                        "value": 42
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "responses": {
+                                    "200": {
+                                        "description": "Key stored successfully",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/SuccessResponse"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "400": {
+                                        "description": "Invalid request"
+                                    },
+                                    "500": {
+                                        "description": "Storage error"
+                                    }
+                                }
+                            }
+                        },
+                        "/api/kv/{key}": {
+                            "get": {
+                                "tags": ["KV"],
+                                "summary": "Get a value by key",
+                                "description": "Retrieve the value for a specific key (Redis-like GET command)",
+                                "operationId": "getKey",
+                                "parameters": [
+                                    {
+                                        "name": "key",
+                                        "in": "path",
+                                        "required": true,
+                                        "schema": {
+                                            "type": "string"
+                                        },
+                                        "example": "username"
+                                    }
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "Key value",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/KeyValueResponse"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "400": {
+                                        "description": "KVS not initialized"
+                                    },
+                                    "500": {
+                                        "description": "Key not found or error"
+                                    }
+                                }
+                            },
+                            "delete": {
+                                "tags": ["KV"],
+                                "summary": "Delete a key",
+                                "description": "Delete a key-value pair from the KVS (Redis-like DEL command)",
+                                "operationId": "deleteKey",
+                                "parameters": [
+                                    {
+                                        "name": "key",
+                                        "in": "path",
+                                        "required": true,
+                                        "schema": {
+                                            "type": "string"
+                                        },
+                                        "example": "username"
+                                    }
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "Key deleted successfully",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/SuccessResponse"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "400": {
+                                        "description": "KVS not initialized"
+                                    },
+                                    "500": {
+                                        "description": "Deletion error"
+                                    }
+                                }
+                            }
+                        },
+                        "/api/config/save": {
+                            "post": {
+                                "tags": ["Swarm"],
+                                "summary": "Save to Swarm",
+                                "description": "Save the current KVS to Swarm and get a reference hash",
+                                "operationId": "saveToSwarm",
+                                "responses": {
+                                    "200": {
+                                        "description": "Saved successfully",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/SaveResponse"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "500": {
+                                        "description": "Save failed"
+                                    }
+                                }
+                            }
+                        },
+                        "/api/config/load": {
+                            "post": {
+                                "tags": ["Swarm"],
+                                "summary": "Load from Swarm",
+                                "description": "Load a KVS from a Swarm reference hash",
+                                "operationId": "loadFromSwarm",
+                                "requestBody": {
+                                    "required": true,
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "$ref": "#/components/schemas/LoadRequest"
+                                            },
+                                            "example": {
+                                                "reference": "b85cdc6b62ace6a049e81ba730fcd9e072f0ebe7c16c2fb7678a806a5681d0af"
+                                            }
+                                        }
+                                    }
+                                },
+                                "responses": {
+                                    "200": {
+                                        "description": "Loaded successfully",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/LoadResponse"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "400": {
+                                        "description": "Invalid reference"
+                                    },
+                                    "500": {
+                                        "description": "Load failed"
+                                    }
+                                }
+                            }
+                        },
+                        "/api/refs": {
+                            "get": {
+                                "tags": ["References"],
+                                "summary": "List references",
+                                "description": "Get all saved reference hashes",
+                                "operationId": "listRefs",
+                                "responses": {
+                                    "200": {
+                                        "description": "List of references",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/RefsResponse"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "/api/refs/{reference}": {
+                            "delete": {
+                                "tags": ["References"],
+                                "summary": "Delete reference",
+                                "description": "Remove a reference from local history (does not delete from Swarm)",
+                                "operationId": "deleteRef",
+                                "parameters": [
+                                    {
+                                        "name": "reference",
+                                        "in": "path",
+                                        "required": true,
+                                        "schema": {
+                                            "type": "string"
+                                        },
+                                        "example": "b85cdc6b62ace6a049e81ba730fcd9e072f0ebe7c16c2fb7678a806a5681d0af"
+                                    }
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "Reference removed",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/SuccessResponse"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "500": {
+                                        "description": "Removal failed"
+                                    }
+                                }
+                            }
+                        },
+                        "/api/bee/test": {
+                            "post": {
+                                "tags": ["Status"],
+                                "summary": "Test Bee connection",
+                                "description": "Test connectivity to a Bee node",
+                                "operationId": "testBee",
+                                "requestBody": {
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "beeUrl": {
+                                                        "type": "string",
+                                                        "example": "http://localhost:1633"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "responses": {
+                                    "200": {
+                                        "description": "Test result",
+                                        "content": {
+                                            "application/json": {
+                                                "schema": {
+                                                    "$ref": "#/components/schemas/BeeTestResponse"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "components": {
+                        "schemas": {
+                            "HealthResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "example": "healthy"
+                                    },
+                                    "mode": {
+                                        "type": "string",
+                                        "enum": ["in-memory", "swarm"],
+                                        "example": "in-memory"
+                                    },
+                                    "beeUrl": {
+                                        "type": "string",
+                                        "example": "http://bee.dappnode:1633"
+                                    },
+                                    "hasBatchId": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "kvsReady": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                }
+                            },
+                            "StatusResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "initialized": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "mode": {
+                                        "type": "string",
+                                        "enum": ["in-memory", "swarm"],
+                                        "example": "in-memory"
+                                    },
+                                    "beeUrl": {
+                                        "type": "string",
+                                        "example": "http://bee.dappnode:1633"
+                                    },
+                                    "hasBatchId": {
+                                        "type": "boolean",
+                                        "example": false
+                                    },
+                                    "savedConfigs": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "keyCount": {
+                                        "type": "integer",
+                                        "example": 5
+                                    }
+                                }
+                            },
+                            "EnvironmentResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "beeUrl": {
+                                        "type": "string",
+                                        "example": "http://bee.dappnode:1633"
+                                    },
+                                    "hasBatchId": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "mode": {
+                                        "type": "string",
+                                        "enum": ["in-memory", "swarm"],
+                                        "example": "swarm"
+                                    },
+                                    "port": {
+                                        "type": "integer",
+                                        "example": 8080
+                                    }
+                                }
+                            },
+                            "InitResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "success": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "mode": {
+                                        "type": "string",
+                                        "enum": ["in-memory", "swarm"],
+                                        "example": "in-memory"
+                                    }
+                                }
+                            },
+                            "PutKeyRequest": {
+                                "type": "object",
+                                "required": ["key", "value"],
+                                "properties": {
+                                    "key": {
+                                        "type": "string",
+                                        "description": "Key name",
+                                        "example": "username"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "description": "Value to store (strings, numbers, or JSON serialized)",
+                                        "example": "alice"
+                                    }
+                                }
+                            },
+                            "KeysResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "success": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "keys": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "key": {
+                                                    "type": "string"
+                                                },
+                                                "value": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "KeyValueResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "success": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "key": {
+                                        "type": "string",
+                                        "example": "username"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "example": "alice"
+                                    }
+                                }
+                            },
+                            "SaveResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "success": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "reference": {
+                                        "type": "string",
+                                        "description": "64-character hex hash",
+                                        "example": "b85cdc6b62ace6a049e81ba730fcd9e072f0ebe7c16c2fb7678a806a5681d0af"
+                                    },
+                                    "mode": {
+                                        "type": "string",
+                                        "enum": ["in-memory", "swarm"],
+                                        "example": "swarm"
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Config saved to decentralized storage"
+                                    }
+                                }
+                            },
+                            "LoadRequest": {
+                                "type": "object",
+                                "required": ["reference"],
+                                "properties": {
+                                    "reference": {
+                                        "type": "string",
+                                        "description": "64-character hex reference hash",
+                                        "example": "b85cdc6b62ace6a049e81ba730fcd9e072f0ebe7c16c2fb7678a806a5681d0af"
+                                    }
+                                }
+                            },
+                            "LoadResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "success": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "KVS loaded from reference"
+                                    },
+                                    "reference": {
+                                        "type": "string",
+                                        "example": "b85cdc6b62ace6a049e81ba730fcd9e072f0ebe7c16c2fb7678a806a5681d0af"
+                                    },
+                                    "keysRecovered": {
+                                        "type": "integer",
+                                        "example": 5
+                                    }
+                                }
+                            },
+                            "RefsResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "success": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "refs": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "reference": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "mode": {
+                                                    "type": "string"
+                                                },
+                                                "keys": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "SuccessResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "success": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Operation successful"
+                                    }
+                                }
+                            },
+                            "BeeTestResponse": {
+                                "type": "object",
+                                "properties": {
+                                    "success": {
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "Bee node is reachable"
+                                    },
+                                    "beeUrl": {
+                                        "type": "string",
+                                        "example": "http://localhost:1633"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout"
+            });
+        };
+    </script>
+</body>
+</html>

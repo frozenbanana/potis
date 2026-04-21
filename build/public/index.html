@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potis - Decentralized Key-Value Store</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div id="toast-container"></div>
+    <div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modal-title">Value</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <pre id="modal-body"></pre>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Potis</h1>
+            <p class="subtitle">Decentralized Key-Value Store (POT + Redis)</p>
+            <div class="nav-links">
+                <a href="/api/docs">API Documentation</a>
+            </div>
+            <div class="mode-header">
+                <span id="mode-badge" class="mode-badge mode-swarm">Swarm</span>
+            </div>
+        </header>
+
+        <section class="card">
+            <div class="section-header">
+                <h2>Database</h2>
+                <button id="btn-refresh" class="btn btn-secondary btn-small">&#8635; Refresh</button>
+            </div>
+            <div id="db-content">
+                <div class="add-row">
+                    <input type="text" id="new-key" placeholder="Key" class="input input-key">
+                    <input type="text" id="new-value" placeholder="Value" class="input input-value">
+                    <button id="btn-set" class="btn btn-primary btn-small">Set</button>
+                </div>
+                <div id="keys-table" class="keys-table">
+                    <div class="keys-header">
+                        <span class="col-key">Key</span>
+                        <span class="col-value">Value</span>
+                        <span class="col-actions">Actions</span>
+                    </div>
+                    <div id="keys-body"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>References</h2>
+            <div class="ref-actions">
+                <button id="btn-save" class="btn btn-primary">Save Snapshot</button>
+                <div class="load-ref-row">
+                    <input type="text" id="load-reference" placeholder="Paste reference hash..." class="input">
+                    <button id="btn-load" class="btn btn-secondary">Load</button>
+                </div>
+            </div>
+            <div id="refs-list">
+                <p class="empty-state">No saved references yet.</p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function showToast(message, type) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast toast-' + type;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function setLoading(btn, loading) {
+            if (!btn) return;
+            if (loading) {
+                btn.disabled = true;
+                btn.dataset.originalText = btn.textContent;
+                btn.textContent = '...';
+            } else {
+                btn.disabled = false;
+                btn.textContent = btn.dataset.originalText || btn.textContent;
+            }
+        }
+
+        async function apiCall(url, options, btn) {
+            if (btn) setLoading(btn, true);
+            try {
+                const res = await fetch(url, {
+                    headers: { 'Content-Type': 'application/json' },
+                    ...options
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    showToast(data.error || 'Request failed', 'error');
+                    return null;
+                }
+                return data;
+            } catch (err) {
+                showToast('Network error: ' + err.message, 'error');
+                return null;
+            } finally {
+                if (btn) setLoading(btn, false);
+            }
+        }
+
+        function showValueModal(key, value) {
+            let display = value;
+            try {
+                const parsed = JSON.parse(value);
+                display = JSON.stringify(parsed, null, 2);
+            } catch {}
+            document.getElementById('modal-title').textContent = key;
+            document.getElementById('modal-body').textContent = display;
+            document.getElementById('modal-overlay').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.add('hidden');
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        function escapeHtml(s) {
+            const div = document.createElement('div');
+            div.textContent = s;
+            return div.innerHTML;
+        }
+
+        function truncateValue(val) {
+            if (val === null || val === undefined) return '(null)';
+            const s = String(val);
+            if (s.length > 60) return s.substring(0, 57) + '...';
+            return s;
+        }
+
+        function formatValuePreview(val) {
+            if (val === null || val === undefined) return '<span class="val-null">(null)</span>';
+            let display = String(val);
+            try {
+                const parsed = JSON.parse(display);
+                display = JSON.stringify(parsed);
+                if (display.length > 60) {
+                    return '<span class="val-json" title="Click to expand">' + escapeHtml(truncateValue(display)) + '</span>';
+                }
+                return '<span class="val-json">' + escapeHtml(display) + '</span>';
+            } catch {
+                if (display.length > 60) {
+                    return '<span class="val-string" title="Click to expand">' + escapeHtml(truncateValue(display)) + '</span>';
+                }
+            }
+            return escapeHtml(display);
+        }
+
+        function renderKeysTable(keys) {
+            const body = document.getElementById('keys-body');
+            if (!keys || keys.length === 0) {
+                body.innerHTML = '<div class="empty-state">No keys yet. Add one above.</div>';
+                return;
+            }
+            body.innerHTML = keys.map(entry => {
+                const valHtml = formatValuePreview(entry.value);
+                const escapedKey = escapeHtml(entry.key).replace(/'/g, "\\'");
+                const valueForModal = entry.value !== null && entry.value !== undefined ? JSON.stringify(entry.value).replace(/'/g, "\\'") : 'null';
+                return '<div class="key-row" data-key="' + escapedKey + '">' +
+                    '<span class="col-key"><code>' + escapedKey + '</code></span>' +
+                    '<span class="col-value" onclick="showValueModal(\'' + escapedKey + '\', ' + valueForModal + ')">' + valHtml + '</span>' +
+                    '<span class="col-actions">' +
+                        '<button class="btn btn-small btn-secondary" onclick="editKey(\'' + escapedKey + '\')">Edit</button>' +
+                        '<button class="btn btn-small btn-danger" onclick="deleteKey(\'' + escapedKey + '\')">Del</button>' +
+                    '</span>' +
+                '</div>';
+            }).join('');
+        }
+
+        async function refreshKeys() {
+            const data = await apiCall('/api/kv', {});
+            if (data) {
+                renderKeysTable(data.keys || []);
+            }
+        }
+
+        let kvsInitialized = false;
+
+        async function ensureKVSInitialized() {
+            if (kvsInitialized) return true;
+            const status = await apiCall('/api/status', {});
+            if (status && status.initialized) {
+                kvsInitialized = true;
+                return true;
+            }
+            // Try to initialize
+            const init = await apiCall('/api/init', { method: 'POST' });
+            if (init) {
+                kvsInitialized = true;
+                showToast('KVS initialized', 'success');
+                return true;
+            }
+            return false;
+        }
+
+        function editKey(key) {
+            const rows = document.querySelectorAll('.key-row');
+            for (const row of rows) {
+                if (row.dataset.key === key) {
+                    const valueEl = row.querySelector('.col-value');
+                    document.getElementById('new-key').value = key;
+                    document.getElementById('new-value').value = valueEl.textContent;
+                    document.getElementById('new-key').focus();
+                    break;
+                }
+            }
+        }
+
+        async function deleteKey(key) {
+            const data = await apiCall('/api/kv/' + encodeURIComponent(key), { method: 'DELETE' });
+            if (data) {
+                showToast(data.message, 'success');
+                refreshKeys();
+            }
+        }
+
+        async function initKVS() {
+            const data = await apiCall('/api/init', { method: 'POST' });
+            if (data) {
+                showToast('KVS initialized', 'success');
+                refreshKeys();
+            }
+        }
+
+        function loadRefs() {
+            fetch('/api/refs').then(r => r.json()).then(data => {
+                const el = document.getElementById('refs-list');
+                if (!data.refs || data.refs.length === 0) {
+                    el.innerHTML = '<p class="empty-state">No saved references yet.</p>';
+                    return;
+                }
+                el.innerHTML = '<ul class="refs-list">' + data.refs.map(ref =>
+                    '<li class="ref-item">' +
+                        '<div class="ref-info">' +
+                            '<code class="ref-hash">' + ref.reference.substring(0, 20) + '...</code>' +
+                            '<span class="ref-meta">' + new Date(ref.timestamp).toLocaleString() + (ref.keys ? ' &middot; ' + ref.keys.length + ' keys' : '') + '</span>' +
+                        '</div>' +
+                        '<button class="btn btn-small" onclick="document.getElementById(\'load-reference\').value=\'' + ref.reference + '\'">Use</button>' +
+                        '<button class="btn btn-small btn-danger" onclick="removeRef(\'' + ref.reference + '\')">Remove</button>' +
+                    '</li>'
+                ).join('') + '</ul>';
+            }).catch(() => {});
+        }
+
+        async function removeRef(ref) {
+            if (!confirm('Remove this reference?')) return;
+            const data = await apiCall('/api/refs/' + ref, { method: 'DELETE' });
+            if (data) {
+                showToast(data.message, 'success');
+                loadRefs();
+            }
+        }
+
+        // Event listeners
+        document.getElementById('btn-set').addEventListener('click', async function() {
+            const key = document.getElementById('new-key').value.trim();
+            const value = document.getElementById('new-value').value.trim();
+            if (!key) { showToast('Key is required', 'error'); return; }
+
+            // Auto-init if needed
+            if (!(await ensureKVSInitialized())) {
+                showToast('Failed to initialize KVS', 'error');
+                return;
+            }
+
+            const data = await apiCall('/api/kv', {
+                method: 'PUT',
+                body: JSON.stringify({ key, value })
+            }, this);
+            if (data) {
+                showToast(data.message, 'success');
+                document.getElementById('new-key').value = '';
+                document.getElementById('new-value').value = '';
+                refreshKeys();
+            }
+        });
+
+        document.getElementById('btn-refresh').addEventListener('click', function() {
+            refreshKeys();
+        });
+
+        document.getElementById('btn-save').addEventListener('click', async function() {
+            const data = await apiCall('/api/config/save', { method: 'POST' }, this);
+            if (data) {
+                showToast('Snapshot saved: ' + data.reference.substring(0, 20) + '...', 'success');
+                loadRefs();
+            }
+        });
+
+        document.getElementById('btn-load').addEventListener('click', async function() {
+            const reference = document.getElementById('load-reference').value.trim();
+            if (!reference) { showToast('Enter a reference hash', 'error'); return; }
+            const data = await apiCall('/api/config/load', {
+                method: 'POST',
+                body: JSON.stringify({ reference })
+            }, this);
+            if (data) {
+                showToast('Loaded! Recovered ' + (data.keysRecovered || 0) + ' keys', 'success');
+                refreshKeys();
+            }
+        });
+
+        // Enter key handling
+        document.getElementById('new-key').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') document.getElementById('new-value').focus();
+        });
+        document.getElementById('new-value').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') document.getElementById('btn-set').click();
+        });
+
+        // Initial load - initialize KVS first, then refresh
+        ensureKVSInitialized().then(ok => {
+            if (ok) {
+                refreshKeys();
+                setInterval(async () => {
+                    if (await ensureKVSInitialized()) {
+                        refreshKeys();
+                    }
+                }, 5000);
+            }
+        });
+        loadRefs();
+    </script>
+</body>
+</html>

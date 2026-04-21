@@ -1,0 +1,32 @@
+services:
+  potis:
+    # For swarm mode, use pre-built image instead of build
+    # Build locally first with: docker-compose build
+    image: potis.public.dappnode.eth:0.1.0
+    build: ./build
+    restart: unless-stopped
+    ports:
+      - "80:8080"
+      - "8080:8080"
+    volumes:
+      - potis-data:/app/data
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+      - BEE_URL=${BEE_URL:-http://host.docker.internal:1633}
+      - BATCH_ID=${BATCH_ID:-}
+    # Required for host.docker.internal to work on Linux
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    # For swarm mode - ensure proper DNS resolution
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+volumes:
+  potis-data: {}
