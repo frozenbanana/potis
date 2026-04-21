@@ -1,0 +1,38 @@
+# Docker Compose for DappNode deployment
+# Place this file on your DappNode and run: docker-compose -f docker-compose.dappnode.yml up -d
+#
+# Prerequisites on DappNode:
+# - Swarm Bee package installed (optional, for Swarm mode)
+# - Postage batch created (optional, for Swarm mode)
+
+services:
+  potis:
+    image: potis.public.dappnode.eth:0.1.0
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - potis-data:/app/data
+    environment:
+      - PORT=8080
+      - NODE_ENV=production
+      # For DappNode with Bee package installed:
+      - BEE_URL=http://bee.dappnode:1633
+      # Leave empty for in-memory mode, or set your batch ID for Swarm mode:
+      - BATCH_ID=${BATCH_ID:-}
+    networks:
+      - dncore_network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  potis-data:
+    driver: local
+
+networks:
+  dncore_network:
+    external: true
