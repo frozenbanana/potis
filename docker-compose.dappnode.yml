@@ -5,6 +5,8 @@
 # - Swarm Bee package installed (optional, for Swarm mode)
 # - Postage batch created (optional, for Swarm mode)
 
+version: "3.8"
+
 services:
   potis:
     image: potis.public.dappnode.eth:0.1.0

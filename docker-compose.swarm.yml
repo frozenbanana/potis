@@ -6,6 +6,8 @@
 # Or with external registry:
 #   docker stack deploy -c docker-compose.swarm.yml potis
 
+version: "3.8"
+
 services:
   potis:
     image: potis.public.dappnode.eth:0.1.0
