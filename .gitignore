@@ -50,3 +50,4 @@ build/!
 # Temporary files
 tmp/
 temp/
+*.tar.gz
