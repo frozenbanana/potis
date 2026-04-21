@@ -10,7 +10,7 @@
     "type": "git",
     "url": "https://github.com/brainiac-five/potis.git"
   },
-  "categories": ["Storage", "Developer Tools"],
+  "categories": ["Developer tools", "Blockchain"],
   "architectures": ["linux/arm64", "linux/amd64"],
   "links": {
     "homepage": "https://github.com/brainiac-five/potis",
